@@ -69,7 +69,7 @@ while running:
         running = False # Stop the game
 
     if has_moved and head_coord in trail_coords:
-        collision_sound = pygame.mixer.Sound(r"C:\Users\omrad\OneDrive\Desktop\Tron Light Cycle - HW\pick_up_sound.wav")
+        collision_sound = pygame.mixer.Sound(r"C:\\Users\\omrad\\OneDrive\\Desktop\\Tron Light Cycle - HW\\pick_up_sound.wav")
         collision_sound.play() # Play the sound givem
         pygame.time.delay(1000)
         running = False # Stop the game
