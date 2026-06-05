@@ -1,18 +1,14 @@
 import pygame
 pygame.init()
 
-# -----------------------------
-# Window
-# -----------------------------
+# ---------------- WINDOW ----------------
 WINDOW_WIDTH = 650
 WINDOW_HEIGHT = 600
 
 display = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Tron Light Cycle")
 
-# -----------------------------
-# Cycle settings
-# -----------------------------
+# ---------------- CYCLE ----------------
 CYCLE_SIZE = 20
 
 cycle_x = WINDOW_WIDTH // 2
@@ -21,38 +17,24 @@ cycle_y = WINDOW_HEIGHT // 2
 cycle_dx = 0
 cycle_dy = 0
 
-move_speed = CYCLE_SIZE
-
-# -----------------------------
-# Game data
-# -----------------------------
+# ---------------- GAME DATA ----------------
 trail_coords = []
 score = 0
 has_moved = False
 
-# -----------------------------
-# FPS
-# -----------------------------
+# ---------------- SETUP ----------------
 clock = pygame.time.Clock()
 FPS = 15
 
 font = pygame.font.SysFont("Arial", 25)
 
-# -----------------------------
-# Sound (load once)
-# -----------------------------
 collision_sound = pygame.mixer.Sound("pick_up_sound.wav")
 
-# -----------------------------
-# Game loop
-# -----------------------------
+# ---------------- GAME LOOP ----------------
 running = True
 
 while running:
 
-    # -------------------------
-    # Events
-    # -------------------------
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
@@ -60,89 +42,50 @@ while running:
 
         if event.type == pygame.KEYDOWN:
 
-            left_pressed = event.key == pygame.K_LEFT
-            right_pressed = event.key == pygame.K_RIGHT
-            up_pressed = event.key == pygame.K_UP
-            down_pressed = event.key == pygame.K_DOWN
-
-            cannot_move_horizontal = cycle_dx != 0
-            cannot_move_vertical = cycle_dy != 0
-
-            if left_pressed and not cannot_move_horizontal:
-                cycle_dx = -move_speed
+            if event.key == pygame.K_LEFT and cycle_dx == 0:
+                cycle_dx = -CYCLE_SIZE
                 cycle_dy = 0
                 has_moved = True
 
-            elif right_pressed and not cannot_move_horizontal:
-                cycle_dx = move_speed
+            elif event.key == pygame.K_RIGHT and cycle_dx == 0:
+                cycle_dx = CYCLE_SIZE
                 cycle_dy = 0
                 has_moved = True
 
-            elif up_pressed and not cannot_move_vertical:
+            elif event.key == pygame.K_UP and cycle_dy == 0:
                 cycle_dx = 0
-                cycle_dy = -move_speed
+                cycle_dy = -CYCLE_SIZE
                 has_moved = True
 
-            elif down_pressed and not cannot_move_vertical:
+            elif event.key == pygame.K_DOWN and cycle_dy == 0:
                 cycle_dx = 0
-                cycle_dy = move_speed
+                cycle_dy = CYCLE_SIZE
                 has_moved = True
 
-    # -------------------------
-    # Move cycle
-    # -------------------------
+    # move cycle
     cycle_x += cycle_dx
     cycle_y += cycle_dy
 
-    # -------------------------
-    # Create cycle rectangle
-    # -------------------------
     cycle_rect = (cycle_x, cycle_y, CYCLE_SIZE, CYCLE_SIZE)
 
-    # -------------------------
-    # Wall checks (simple steps)
-    # -------------------------
-    left_wall_hit = cycle_x < 0
-    right_wall_hit = cycle_x >= WINDOW_WIDTH
-    top_wall_hit = cycle_y < 0
-    bottom_wall_hit = cycle_y >= WINDOW_HEIGHT
-
-    hit_wall = (
-        left_wall_hit or
-        right_wall_hit or
-        top_wall_hit or
-        bottom_wall_hit
-    )
-
-    if hit_wall:
+    # wall collision
+    if cycle_x < 0 or cycle_x >= WINDOW_WIDTH or cycle_y < 0 or cycle_y >= WINDOW_HEIGHT:
         collision_sound.play()
         pygame.time.delay(1000)
         running = False
 
-    # -------------------------
-    # Trail collision
-    # -------------------------
-    hit_trail = cycle_rect in trail_coords
-
-    if has_moved and hit_trail:
+    # trail collision
+    if has_moved and cycle_rect in trail_coords:
         collision_sound.play()
         pygame.time.delay(1000)
         running = False
 
-    # -------------------------
-    # Add trail
-    # -------------------------
     trail_coords.insert(0, cycle_rect)
 
-    # -------------------------
-    # Score
-    # -------------------------
     if has_moved:
         score += 1
 
-    # -------------------------
-    # Draw
-    # -------------------------
+    # draw
     display.fill((255, 255, 255))
 
     for block in trail_coords:
